@@ -15,12 +15,11 @@
   
 //   while(!Serial.available());
   
-//   // Take multiple readings
+//   Take multiple readings
 //   float sum = 0;
 //   int samples = 150;
   
-//   Serial.println(" Warming up and then Taking readings...");
-//   delay(25000);
+
 //   for(int i = 0; i < samples; i++) {
 //     float Vout = analogRead(MQ135_PIN) * (Vc / 4095.0);  // 12-bit ADC
 //     float Rs = ((Vc / Vout) - 1) * RL;
@@ -34,7 +33,7 @@
 //   Serial.print("Average Rs: "); Serial.println(avgRs);
 //   Serial.print("Calculated R0: "); Serial.println(R0);
   
-//   // Save to EEPROM
+//   Save to EEPROM
 //   EEPROM.put(0, R0);
 //   EEPROM.commit();
   
