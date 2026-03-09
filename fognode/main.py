@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 app = Flask(__name__)
 
 REQUIRED_FIELDS = {"temperature", "humidity", "co2_ppm"}
-CLOUD_BACKEND_URL = "https://your-cloud-server.example.com/data"
+CLOUD_BACKEND_URL = "http://127.0.0.1:5000/data"
 
 
 def get_phone_location():
@@ -60,7 +60,7 @@ def receive_sensor():
         }
 
         # resp = requests.post(CLOUD_BACKEND_URL, json=enriched, timeout=10)
-
+        print(enriched)
         return jsonify({
             "status": "forwarded",
             # "cloud_status": resp.status_code,
