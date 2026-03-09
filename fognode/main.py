@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 app = Flask(__name__)
 
 REQUIRED_FIELDS = {"temperature", "humidity", "co2_ppm"}
-CLOUD_BACKEND_URL = "http://127.0.0.1:5000/data"
+CLOUD_BACKEND_URL = "https://ec17-2401-4900-6296-bcb6-f956-45ff-9078-9c53.ngrok-free.app/data"
 
 
 def get_phone_location():
@@ -59,11 +59,11 @@ def receive_sensor():
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
-        # resp = requests.post(CLOUD_BACKEND_URL, json=enriched, timeout=10)
+        resp = requests.post(CLOUD_BACKEND_URL, json=enriched, timeout=10)
         print(enriched)
         return jsonify({
             "status": "forwarded",
-            # "cloud_status": resp.status_code,
+            "cloud_status": resp.status_code,
             "payload": enriched
         }), 200
 
