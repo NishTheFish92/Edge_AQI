@@ -1,2 +1,5 @@
 firmware/.pio
 firmware/.vscode
+.venv
+.env
+firmware/src/secrets.h
