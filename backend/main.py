@@ -23,6 +23,8 @@ PORT = int(os.getenv("PORT", 5001))
 
 REQUIRED_FIELDS = {"temperature", "humidity", "co2_ppm", "latitude", "longitude"}
 
+_reading_buffer = []
+
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
@@ -102,26 +104,29 @@ def receive_data():
     except (TypeError, ValueError) as e:
         return jsonify({"error": f"Invalid field type: {str(e)}"}), 400
 
+    _reading_buffer.append((temperature, humidity, co2_ppm, latitude, longitude))
+
+    if len(_reading_buffer) < 10:
+        return jsonify({"status": "ok", "message": "Reading buffered", "buffered": len(_reading_buffer)}), 200
+
+    # Average the 10 readings
+    avg = [sum(col) / 10 for col in zip(*_reading_buffer)]
+    avg_temp, avg_hum, avg_co2, avg_lat, avg_lon = avg
+    _reading_buffer.clear()
+
     try:
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO readings (temperature, humidity, co2_ppm, latitude, longitude, timestamp, source)
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (temperature, humidity, co2_ppm, latitude, longitude, timestamp, source))
+        """, (avg_temp, avg_hum, avg_co2, avg_lat, avg_lon, timestamp, source))
         reading_id = cur.lastrowid
         conn.commit()
         conn.close()
 
-        logger.info(
-            "Stored id=%d temp=%.1f hum=%.1f co2=%.1f",
-            reading_id, temperature, humidity, co2_ppm,
-        )
-        return jsonify({
-            "status": "ok",
-            "message": "Reading stored successfully",
-            "id": reading_id,
-        }), 201
+        logger.info("Stored averaged id=%d temp=%.1f hum=%.1f co2=%.1f", reading_id, avg_temp, avg_hum, avg_co2)
+        return jsonify({"status": "ok", "message": "Averaged reading stored", "id": reading_id}), 201
 
     except Exception as e:
         return jsonify({"error": f"Database insert failed: {str(e)}"}), 500
