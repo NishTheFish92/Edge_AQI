@@ -59,11 +59,11 @@ def receive_sensor():
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
-        resp = requests.post(CLOUD_BACKEND_URL, json=enriched, timeout=10)
+        # resp = requests.post(CLOUD_BACKEND_URL, json=enriched, timeout=10)
 
         return jsonify({
             "status": "forwarded",
-            "cloud_status": resp.status_code,
+            # "cloud_status": resp.status_code,
             "payload": enriched
         }), 200
 
