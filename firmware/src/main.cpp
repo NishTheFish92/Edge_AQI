@@ -47,7 +47,7 @@ void sendData(float avgTemp, float avgHum, float avgCO2) {
     return;
   }
 
-  String url = "http://" + WiFi.gatewayIP().toString() + ":5000/data";
+  String url = "http://" + WiFi.gatewayIP().toString() + ":5000/sensor";
   String payload = "{\"temperature\":" + String(avgTemp, 2)
                  + ",\"humidity\":"    + String(avgHum,  2)
                  + ",\"co2_ppm\":"     + String(avgCO2,  2) + "}";
