@@ -3,7 +3,7 @@ import os
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
-
+from map import generate_map
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 
@@ -100,7 +100,7 @@ def receive_data():
 
         timestamp = data.get("timestamp") or datetime.now(timezone.utc).isoformat()
         source = str(data.get("source", "phone_fognode"))
-
+        
     except (TypeError, ValueError) as e:
         return jsonify({"error": f"Invalid field type: {str(e)}"}), 400
 
@@ -126,6 +126,7 @@ def receive_data():
         conn.close()
 
         logger.info("Stored averaged id=%d temp=%.1f hum=%.1f co2=%.1f", reading_id, avg_temp, avg_hum, avg_co2)
+        generate_map()
         return jsonify({"status": "ok", "message": "Averaged reading stored", "id": reading_id}), 201
 
     except Exception as e:

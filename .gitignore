@@ -3,3 +3,4 @@ firmware/.vscode
 .venv
 .env
 firmware/src/secrets.h
+__pycache__/
