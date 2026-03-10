@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_37ec4bce7c82b2ff5fc9d8d83e825b22 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@main/folium/templates/leaflet_heat.min.js"></script>
+</head>
+<body>
+    
+    
+    <div style="
+        position: fixed; bottom: 30px; left: 30px; z-index: 9999;
+        background: rgba(20,20,20,0.88); color: #eee;
+        padding: 14px 18px; border-radius: 10px;
+        font-family: monospace; font-size: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        border: 1px solid rgba(255,255,255,0.12);
+        ">
+        <b style="font-size:13px">Air Quality Legend</b><br><br>
+        <b>CO₂ (ppm)</b><br>
+        <span style="color:#00cfff">&#9632;</span> Normal<br>
+        <span style="color:#0050ff">&#9632;</span>  Elevated<br>
+        <span style="color:#cc0066">&#9632;</span> High<br>
+        <br>
+        <b>Temperature (°C)</b><br>
+        <span style="color:#00ff00">&#9632;</span> Cool<br>
+        <span style="color:#ffff00">&#9632;</span> Warm<br>
+        <span style="color:#ff0000">&#9632;</span> Hot<br>
+    </div>
+    
+    
+            <div class="folium-map" id="map_37ec4bce7c82b2ff5fc9d8d83e825b22" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_37ec4bce7c82b2ff5fc9d8d83e825b22 = L.map(
+                "map_37ec4bce7c82b2ff5fc9d8d83e825b22",
+                {
+                    center: [12.973049997026317, 79.15889557700002],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 13,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_e76c72584dbf2c112ee95ace9c5fe887 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_e76c72584dbf2c112ee95ace9c5fe887.addTo(map_37ec4bce7c82b2ff5fc9d8d83e825b22);
+        
+    
+            var heat_map_9c7120389dcb4d844825fc830e1c49ff = L.heatLayer(
+                [[12.972869784, 79.15862692200001, 0.0], [12.972910245, 79.158539675, 0.1122626758990395], [12.972925448000002, 79.158483084, 0.1271833817288363], [12.973012734, 79.158684566, 0.16765691311145864], [12.972894456, 79.15886156399999, 0.20183158364976556], [12.972790713, 79.158940154, 0.33866428411882954], [12.972753549999998, 79.15887756, 0.39459459459459456], [12.9728712, 79.15887437, 0.28170649988831803], [12.972733299999998, 79.159186605, 0.8826446280991735], [12.972596651999998, 79.159521546, 0.5725709180254636], [12.97260166, 79.15961237, 0.627563100290373], [12.972568675, 79.160108765, 1.0], [12.972556489999999, 79.160503496, 0.5673442037078401], [12.972730894, 79.160809971, 0.15215546124637033], [12.973151089999998, 79.16099685, 0.19450524905070363], [12.97371177, 79.16091933, 0.2699128880947063], [12.973782595999998, 79.16054868699999, 0.6765244583426403], [12.973764982, 79.160182772, 0.49475094929640384], [12.973699864, 79.159806845, 0.257806566897476], [12.97376137, 79.15921892, 0.38633013178467723], [12.97368017, 79.15876019999999, 0.9601072146526691], [12.973641914999998, 79.158592345, 0.9863301317846772], [12.973622627999998, 79.158415322, 0.5684163502345321], [12.9736173, 79.15791993, 0.22425731516640612], [12.973665180000001, 79.157308659, 0.18003127094036186], [12.973332172, 79.156924954, 0.35412106321197234], [12.973077121, 79.156712897, 0.8608889881617154], [12.97300829, 79.15670932, 0.7919142282778647], [12.972691029999998, 79.1571251, 0.29211525575161945], [12.972732021999999, 79.157644892, 0.8707169979897251], [12.972736205999999, 79.15809948799999, 0.7907974089792271], [12.972704841, 79.158479175, 0.4691534509716328], [12.972603240000002, 79.15876668, 0.0630779539870449], [12.97277076, 79.15899969899999, 0.07831136922046018], [12.9728416, 79.15909751, 0.08733526915345094], [12.972840264000002, 79.159088754, 0.09685056957784233], [12.972835667999998, 79.15906941099999, 0.11136922046012954], [12.972812007000002, 79.159013538, 0.12218003127094039]],
+                {
+  "minOpacity": 0.35,
+  "maxZoom": 18,
+  "radius": 22,
+  "blur": 14,
+  "gradient": {
+  0.0: "#00cfff",
+  0.4: "#0050ff",
+  0.7: "#6600cc",
+  1.0: "#cc0066",
+},
+}
+            );
+        
+    
+            heat_map_9c7120389dcb4d844825fc830e1c49ff.addTo(map_37ec4bce7c82b2ff5fc9d8d83e825b22);
+        
+    
+            var heat_map_50bceb075bd3c31eb819a4d6302710d1 = L.heatLayer(
+                [[12.972869784, 79.15862692200001, 0.6510869565217385], [12.972910245, 79.158539675, 0.500724637681159], [12.972925448000002, 79.158483084, 0.14166666666666614], [12.973012734, 79.158684566, 0.10942028985507239], [12.972894456, 79.15886156399999, 0.12789855072463704], [12.972790713, 79.158940154, 0.07246376811594182], [12.972753549999998, 79.15887756, 0.0], [12.9728712, 79.15887437, 0.4217391304347822], [12.972733299999998, 79.159186605, 0.519202898550725], [12.972596651999998, 79.159521546, 0.5010869565217392], [12.97260166, 79.15961237, 0.5115942028985495], [12.972568675, 79.160108765, 0.48514492753623173], [12.972556489999999, 79.160503496, 0.4231884057971002], [12.972730894, 79.160809971, 0.43876811594202747], [12.973151089999998, 79.16099685, 0.5271739130434767], [12.97371177, 79.16091933, 0.6413043478260873], [12.973782595999998, 79.16054868699999, 0.34999999999999937], [12.973764982, 79.160182772, 0.426449275362319], [12.973699864, 79.159806845, 1.0], [12.97376137, 79.15921892, 0.9050724637681157], [12.97368017, 79.15876019999999, 0.6768115942028973], [12.973641914999998, 79.158592345, 0.5728260869565207], [12.973622627999998, 79.158415322, 0.4398550724637679], [12.9736173, 79.15791993, 0.398550724637682], [12.973665180000001, 79.157308659, 0.5376811594202896], [12.973332172, 79.156924954, 0.6036231884057964], [12.973077121, 79.156712897, 0.6996376811594186], [12.97300829, 79.15670932, 0.7420289855072449], [12.972691029999998, 79.1571251, 0.6851449275362317], [12.972732021999999, 79.157644892, 0.47572463768115936], [12.972736205999999, 79.15809948799999, 0.41775362318840564], [12.972704841, 79.158479175, 0.40253623188405724], [12.972603240000002, 79.15876668, 0.31086956521739045], [12.97277076, 79.15899969899999, 0.3163043478260863], [12.9728416, 79.15909751, 0.3452898550724625], [12.972840264000002, 79.159088754, 0.31847826086956466], [12.972835667999998, 79.15906941099999, 0.3090579710144922], [12.972812007000002, 79.159013538, 0.3090579710144922]],
+                {
+  "minOpacity": 0.35,
+  "maxZoom": 18,
+  "radius": 22,
+  "blur": 14,
+  "gradient": {
+  0.0: "#00ff00",
+  0.4: "#ffff00",
+  0.7: "#ff7700",
+  1.0: "#ff0000",
+},
+}
+            );
+        
+    
+            var feature_group_80713be6de0c122f90afb46faf23cd95 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_c2c9219c38c94be02397b8e42523f74e = L.circleMarker(
+                [12.972869784, 79.15862692200001],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_c7afe8039098d77f9032fd3c9f70b828 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_c75b01dbc5646ed6cb13a0d7b6ee08dc = $(`<div id="html_c75b01dbc5646ed6cb13a0d7b6ee08dc" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>8 ppm</b><br>             Temperature : <b>30.2 °C</b><br>             Humidity    : <b>50.4 %</b><br>             <small style="color:#888">                 (12.97287, 79.15863)<br>                 2026-03-10T12:08:34.660273+00:00             </small>         </div>         </div>`)[0];
+                popup_c7afe8039098d77f9032fd3c9f70b828.setContent(html_c75b01dbc5646ed6cb13a0d7b6ee08dc);
+            
+        
+
+        circle_marker_c2c9219c38c94be02397b8e42523f74e.bindPopup(popup_c7afe8039098d77f9032fd3c9f70b828)
+        ;
+
+        
+    
+    
+            var circle_marker_ed5c6237da00b843eae47198b0faec32 = L.circleMarker(
+                [12.972910245, 79.158539675],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_ea64e2bcf9ec5f03a263cec13afdff7f = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_bbb972567d8c98695e99821ea70d259e = $(`<div id="html_bbb972567d8c98695e99821ea70d259e" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>10 ppm</b><br>             Temperature : <b>29.8 °C</b><br>             Humidity    : <b>55.8 %</b><br>             <small style="color:#888">                 (12.97291, 79.15854)<br>                 2026-03-10T12:07:41.844147+00:00             </small>         </div>         </div>`)[0];
+                popup_ea64e2bcf9ec5f03a263cec13afdff7f.setContent(html_bbb972567d8c98695e99821ea70d259e);
+            
+        
+
+        circle_marker_ed5c6237da00b843eae47198b0faec32.bindPopup(popup_ea64e2bcf9ec5f03a263cec13afdff7f)
+        ;
+
+        
+    
+    
+            var circle_marker_65cfb8614eca89525c2f3e0127f8a143 = L.circleMarker(
+                [12.972925448000002, 79.158483084],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_341a4f7f731d9a42b446740ae38ae25b = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_bc686dce2fc2c1b7b6d30ba74b95075c = $(`<div id="html_bc686dce2fc2c1b7b6d30ba74b95075c" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>11 ppm</b><br>             Temperature : <b>28.8 °C</b><br>             Humidity    : <b>57.3 %</b><br>             <small style="color:#888">                 (12.97293, 79.15848)<br>                 2026-03-10T12:06:50.986431+00:00             </small>         </div>         </div>`)[0];
+                popup_341a4f7f731d9a42b446740ae38ae25b.setContent(html_bc686dce2fc2c1b7b6d30ba74b95075c);
+            
+        
+
+        circle_marker_65cfb8614eca89525c2f3e0127f8a143.bindPopup(popup_341a4f7f731d9a42b446740ae38ae25b)
+        ;
+
+        
+    
+    
+            var circle_marker_0884bf95973ad65818f800cdb0f0bf1c = L.circleMarker(
+                [12.973012734, 79.158684566],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_bc1128d546adbbfbaac660d378985f91 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_df4e302881de241a0c6ba4ce9836701c = $(`<div id="html_df4e302881de241a0c6ba4ce9836701c" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>11 ppm</b><br>             Temperature : <b>28.7 °C</b><br>             Humidity    : <b>54.2 %</b><br>             <small style="color:#888">                 (12.97301, 79.15868)<br>                 2026-03-10T12:06:10.079272+00:00             </small>         </div>         </div>`)[0];
+                popup_bc1128d546adbbfbaac660d378985f91.setContent(html_df4e302881de241a0c6ba4ce9836701c);
+            
+        
+
+        circle_marker_0884bf95973ad65818f800cdb0f0bf1c.bindPopup(popup_bc1128d546adbbfbaac660d378985f91)
+        ;
+
+        
+    
+    
+            var circle_marker_925dff5827ed5034acd39403664a058d = L.circleMarker(
+                [12.972894456, 79.15886156399999],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_2eda2352968dcbd218c10bf16c4ee59f = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_0daf010f2b25a302594d007e596a81d5 = $(`<div id="html_0daf010f2b25a302594d007e596a81d5" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>12 ppm</b><br>             Temperature : <b>28.8 °C</b><br>             Humidity    : <b>52.9 %</b><br>             <small style="color:#888">                 (12.97289, 79.15886)<br>                 2026-03-10T12:05:06.600936+00:00             </small>         </div>         </div>`)[0];
+                popup_2eda2352968dcbd218c10bf16c4ee59f.setContent(html_0daf010f2b25a302594d007e596a81d5);
+            
+        
+
+        circle_marker_925dff5827ed5034acd39403664a058d.bindPopup(popup_2eda2352968dcbd218c10bf16c4ee59f)
+        ;
+
+        
+    
+    
+            var circle_marker_95b23b57960595484959a54b827489df = L.circleMarker(
+                [12.972790713, 79.158940154],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_9712def55de473267fcb7296c3f7e33b = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_99c74b49ec08e7fe03973237c4389c4c = $(`<div id="html_99c74b49ec08e7fe03973237c4389c4c" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>15 ppm</b><br>             Temperature : <b>28.6 °C</b><br>             Humidity    : <b>53.3 %</b><br>             <small style="color:#888">                 (12.97279, 79.15894)<br>                 2026-03-10T12:04:13.809362+00:00             </small>         </div>         </div>`)[0];
+                popup_9712def55de473267fcb7296c3f7e33b.setContent(html_99c74b49ec08e7fe03973237c4389c4c);
+            
+        
+
+        circle_marker_95b23b57960595484959a54b827489df.bindPopup(popup_9712def55de473267fcb7296c3f7e33b)
+        ;
+
+        
+    
+    
+            var circle_marker_4894e1e9290381686af8bf3532ed6493 = L.circleMarker(
+                [12.972753549999998, 79.15887756],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_76d44df131d889d339bfcfbfd4704855 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_7421d01f30878afedfb713d5b7bd657a = $(`<div id="html_7421d01f30878afedfb713d5b7bd657a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>17 ppm</b><br>             Temperature : <b>28.4 °C</b><br>             Humidity    : <b>54.3 %</b><br>             <small style="color:#888">                 (12.97275, 79.15888)<br>                 2026-03-10T12:03:21.591740+00:00             </small>         </div>         </div>`)[0];
+                popup_76d44df131d889d339bfcfbfd4704855.setContent(html_7421d01f30878afedfb713d5b7bd657a);
+            
+        
+
+        circle_marker_4894e1e9290381686af8bf3532ed6493.bindPopup(popup_76d44df131d889d339bfcfbfd4704855)
+        ;
+
+        
+    
+    
+            var circle_marker_22a6b3b65204ed5a4aeabddcb8b4335d = L.circleMarker(
+                [12.9728712, 79.15887437],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_b3cbf086e844cc8e4d8fa5556452569b = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_2e9bc83fd98ad4ea880687d5f70fc71a = $(`<div id="html_2e9bc83fd98ad4ea880687d5f70fc71a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>14 ppm</b><br>             Temperature : <b>29.6 °C</b><br>             Humidity    : <b>52.9 %</b><br>             <small style="color:#888">                 (12.97287, 79.15887)<br>                 2026-03-10T11:49:59.356636+00:00             </small>         </div>         </div>`)[0];
+                popup_b3cbf086e844cc8e4d8fa5556452569b.setContent(html_2e9bc83fd98ad4ea880687d5f70fc71a);
+            
+        
+
+        circle_marker_22a6b3b65204ed5a4aeabddcb8b4335d.bindPopup(popup_b3cbf086e844cc8e4d8fa5556452569b)
+        ;
+
+        
+    
+    
+            var circle_marker_1b803e7d7c9d2350371bf576a5cdc5e9 = L.circleMarker(
+                [12.972733299999998, 79.159186605],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_dac781e8e2514c9fd7a11951a152cfbb = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_d2dd4f71b9aa8dcff62c8bca396123de = $(`<div id="html_d2dd4f71b9aa8dcff62c8bca396123de" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>27 ppm</b><br>             Temperature : <b>29.9 °C</b><br>             Humidity    : <b>55.9 %</b><br>             <small style="color:#888">                 (12.97273, 79.15919)<br>                 2026-03-10T11:48:23.089886+00:00             </small>         </div>         </div>`)[0];
+                popup_dac781e8e2514c9fd7a11951a152cfbb.setContent(html_d2dd4f71b9aa8dcff62c8bca396123de);
+            
+        
+
+        circle_marker_1b803e7d7c9d2350371bf576a5cdc5e9.bindPopup(popup_dac781e8e2514c9fd7a11951a152cfbb)
+        ;
+
+        
+    
+    
+            var circle_marker_aaf3a8419a55c847160bd762a7272f69 = L.circleMarker(
+                [12.972596651999998, 79.159521546],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_defea004a626dcea11a2530433efdcea = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_3b33a578c1179e386eb9cbd8d3968dd4 = $(`<div id="html_3b33a578c1179e386eb9cbd8d3968dd4" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>21 ppm</b><br>             Temperature : <b>29.8 °C</b><br>             Humidity    : <b>55.3 %</b><br>             <small style="color:#888">                 (12.97260, 79.15952)<br>                 2026-03-10T11:47:31.059597+00:00             </small>         </div>         </div>`)[0];
+                popup_defea004a626dcea11a2530433efdcea.setContent(html_3b33a578c1179e386eb9cbd8d3968dd4);
+            
+        
+
+        circle_marker_aaf3a8419a55c847160bd762a7272f69.bindPopup(popup_defea004a626dcea11a2530433efdcea)
+        ;
+
+        
+    
+    
+            var circle_marker_6037f727531a16af35a9bd9d485af5d7 = L.circleMarker(
+                [12.97260166, 79.15961237],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_5e0c58f30452aa0c742edc7d7b46799b = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_e3237aa6f8047d734542f322961b2e82 = $(`<div id="html_e3237aa6f8047d734542f322961b2e82" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>22 ppm</b><br>             Temperature : <b>29.9 °C</b><br>             Humidity    : <b>53.2 %</b><br>             <small style="color:#888">                 (12.97260, 79.15961)<br>                 2026-03-10T11:46:41.046572+00:00             </small>         </div>         </div>`)[0];
+                popup_5e0c58f30452aa0c742edc7d7b46799b.setContent(html_e3237aa6f8047d734542f322961b2e82);
+            
+        
+
+        circle_marker_6037f727531a16af35a9bd9d485af5d7.bindPopup(popup_5e0c58f30452aa0c742edc7d7b46799b)
+        ;
+
+        
+    
+    
+            var circle_marker_013e314b3198d35d21328d3b6250e6cb = L.circleMarker(
+                [12.972568675, 79.160108765],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_2499b794f42ff8e54965ca603de6dd34 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_7ef4c2eee95569ac0cafe2b02fea3ca7 = $(`<div id="html_7ef4c2eee95569ac0cafe2b02fea3ca7" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>30 ppm</b><br>             Temperature : <b>29.8 °C</b><br>             Humidity    : <b>53.6 %</b><br>             <small style="color:#888">                 (12.97257, 79.16011)<br>                 2026-03-10T11:45:55.036580+00:00             </small>         </div>         </div>`)[0];
+                popup_2499b794f42ff8e54965ca603de6dd34.setContent(html_7ef4c2eee95569ac0cafe2b02fea3ca7);
+            
+        
+
+        circle_marker_013e314b3198d35d21328d3b6250e6cb.bindPopup(popup_2499b794f42ff8e54965ca603de6dd34)
+        ;
+
+        
+    
+    
+            var circle_marker_6cc1aa069bfea7ff34769499cff4c2b1 = L.circleMarker(
+                [12.972556489999999, 79.160503496],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_626ffa406adcaeda0b69354445ae7504 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_81b49599a6f87752a5dcc8289c54e92f = $(`<div id="html_81b49599a6f87752a5dcc8289c54e92f" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>20 ppm</b><br>             Temperature : <b>29.6 °C</b><br>             Humidity    : <b>53.2 %</b><br>             <small style="color:#888">                 (12.97256, 79.16050)<br>                 2026-03-10T11:45:01.038200+00:00             </small>         </div>         </div>`)[0];
+                popup_626ffa406adcaeda0b69354445ae7504.setContent(html_81b49599a6f87752a5dcc8289c54e92f);
+            
+        
+
+        circle_marker_6cc1aa069bfea7ff34769499cff4c2b1.bindPopup(popup_626ffa406adcaeda0b69354445ae7504)
+        ;
+
+        
+    
+    
+            var circle_marker_8969ae401703f5c73025a3fcdfe71474 = L.circleMarker(
+                [12.972730894, 79.160809971],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_a9bc050280217c50022713938a02a852 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_0681237b22b1bd554eaa7b9cb0042b36 = $(`<div id="html_0681237b22b1bd554eaa7b9cb0042b36" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>11 ppm</b><br>             Temperature : <b>29.7 °C</b><br>             Humidity    : <b>52.4 %</b><br>             <small style="color:#888">                 (12.97273, 79.16081)<br>                 2026-03-10T11:44:11.050123+00:00             </small>         </div>         </div>`)[0];
+                popup_a9bc050280217c50022713938a02a852.setContent(html_0681237b22b1bd554eaa7b9cb0042b36);
+            
+        
+
+        circle_marker_8969ae401703f5c73025a3fcdfe71474.bindPopup(popup_a9bc050280217c50022713938a02a852)
+        ;
+
+        
+    
+    
+            var circle_marker_3958d05966d475c08a86822a5da83f84 = L.circleMarker(
+                [12.973151089999998, 79.16099685],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_54ba799be3228801aba9d199443889da = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_ac9b3814df6fca68398c8ee00d9d971b = $(`<div id="html_ac9b3814df6fca68398c8ee00d9d971b" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>12 ppm</b><br>             Temperature : <b>29.9 °C</b><br>             Humidity    : <b>53.8 %</b><br>             <small style="color:#888">                 (12.97315, 79.16100)<br>                 2026-03-10T11:43:21.033163+00:00             </small>         </div>         </div>`)[0];
+                popup_54ba799be3228801aba9d199443889da.setContent(html_ac9b3814df6fca68398c8ee00d9d971b);
+            
+        
+
+        circle_marker_3958d05966d475c08a86822a5da83f84.bindPopup(popup_54ba799be3228801aba9d199443889da)
+        ;
+
+        
+    
+    
+            var circle_marker_02fd70cdcd190b1e6bf50bf52116c79c = L.circleMarker(
+                [12.97371177, 79.16091933],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_72c360c5eedaa0f3a562eaf3ff14d364 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_7bc007d48c8c2a75830672fe02498c94 = $(`<div id="html_7bc007d48c8c2a75830672fe02498c94" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>14 ppm</b><br>             Temperature : <b>30.2 °C</b><br>             Humidity    : <b>76.7 %</b><br>             <small style="color:#888">                 (12.97371, 79.16092)<br>                 2026-03-10T11:42:30.932968+00:00             </small>         </div>         </div>`)[0];
+                popup_72c360c5eedaa0f3a562eaf3ff14d364.setContent(html_7bc007d48c8c2a75830672fe02498c94);
+            
+        
+
+        circle_marker_02fd70cdcd190b1e6bf50bf52116c79c.bindPopup(popup_72c360c5eedaa0f3a562eaf3ff14d364)
+        ;
+
+        
+    
+    
+            var circle_marker_49ba2bf69a73ee74a9bb4828eb0ef37f = L.circleMarker(
+                [12.973782595999998, 79.16054868699999],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_c95664ca91784582e9cea3623a7de11a = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_cbc9cba87387be24d87cf4e2a7e00ca7 = $(`<div id="html_cbc9cba87387be24d87cf4e2a7e00ca7" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>23 ppm</b><br>             Temperature : <b>29.4 °C</b><br>             Humidity    : <b>54.2 %</b><br>             <small style="color:#888">                 (12.97378, 79.16055)<br>                 2026-03-10T11:41:40.920840+00:00             </small>         </div>         </div>`)[0];
+                popup_c95664ca91784582e9cea3623a7de11a.setContent(html_cbc9cba87387be24d87cf4e2a7e00ca7);
+            
+        
+
+        circle_marker_49ba2bf69a73ee74a9bb4828eb0ef37f.bindPopup(popup_c95664ca91784582e9cea3623a7de11a)
+        ;
+
+        
+    
+    
+            var circle_marker_99abbf573f74192fba1265eb88502c72 = L.circleMarker(
+                [12.973764982, 79.160182772],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_747ca7b0772446b655668affd658d7bc = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_401ff2e74d879a0a470f58688bcfe756 = $(`<div id="html_401ff2e74d879a0a470f58688bcfe756" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>19 ppm</b><br>             Temperature : <b>29.6 °C</b><br>             Humidity    : <b>53.9 %</b><br>             <small style="color:#888">                 (12.97376, 79.16018)<br>                 2026-03-10T11:40:50.930122+00:00             </small>         </div>         </div>`)[0];
+                popup_747ca7b0772446b655668affd658d7bc.setContent(html_401ff2e74d879a0a470f58688bcfe756);
+            
+        
+
+        circle_marker_99abbf573f74192fba1265eb88502c72.bindPopup(popup_747ca7b0772446b655668affd658d7bc)
+        ;
+
+        
+    
+    
+            var circle_marker_80d22a9956b40bbb9974c853494e62e3 = L.circleMarker(
+                [12.973699864, 79.159806845],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_9359ea46723b828c8a0a5e0b83febd1c = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_7acecf649e893dcf716d202e05232aa6 = $(`<div id="html_7acecf649e893dcf716d202e05232aa6" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>14 ppm</b><br>             Temperature : <b>31.2 °C</b><br>             Humidity    : <b>78.9 %</b><br>             <small style="color:#888">                 (12.97370, 79.15981)<br>                 2026-03-10T11:40:00.923327+00:00             </small>         </div>         </div>`)[0];
+                popup_9359ea46723b828c8a0a5e0b83febd1c.setContent(html_7acecf649e893dcf716d202e05232aa6);
+            
+        
+
+        circle_marker_80d22a9956b40bbb9974c853494e62e3.bindPopup(popup_9359ea46723b828c8a0a5e0b83febd1c)
+        ;
+
+        
+    
+    
+            var circle_marker_2e10c423306ba869ae190ed2e398e4a0 = L.circleMarker(
+                [12.97376137, 79.15921892],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_fe09e789daee53fddab7d0b8622dd059 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_c8fe810af4445e5493fb361177fcd022 = $(`<div id="html_c8fe810af4445e5493fb361177fcd022" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>16 ppm</b><br>             Temperature : <b>30.9 °C</b><br>             Humidity    : <b>80.7 %</b><br>             <small style="color:#888">                 (12.97376, 79.15922)<br>                 2026-03-10T11:39:10.952537+00:00             </small>         </div>         </div>`)[0];
+                popup_fe09e789daee53fddab7d0b8622dd059.setContent(html_c8fe810af4445e5493fb361177fcd022);
+            
+        
+
+        circle_marker_2e10c423306ba869ae190ed2e398e4a0.bindPopup(popup_fe09e789daee53fddab7d0b8622dd059)
+        ;
+
+        
+    
+    
+            var circle_marker_f0bd9d39ae2d5b11e9c508ce2ea634c7 = L.circleMarker(
+                [12.97368017, 79.15876019999999],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_8ab7f92386b24a7e099f20bdf1ddb309 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_03db18cba5c14142c87f83ce2ee829b4 = $(`<div id="html_03db18cba5c14142c87f83ce2ee829b4" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>29 ppm</b><br>             Temperature : <b>30.3 °C</b><br>             Humidity    : <b>56.1 %</b><br>             <small style="color:#888">                 (12.97368, 79.15876)<br>                 2026-03-10T11:38:20.928984+00:00             </small>         </div>         </div>`)[0];
+                popup_8ab7f92386b24a7e099f20bdf1ddb309.setContent(html_03db18cba5c14142c87f83ce2ee829b4);
+            
+        
+
+        circle_marker_f0bd9d39ae2d5b11e9c508ce2ea634c7.bindPopup(popup_8ab7f92386b24a7e099f20bdf1ddb309)
+        ;
+
+        
+    
+    
+            var circle_marker_50c7fffffd27376941c62f3d0e5bbc27 = L.circleMarker(
+                [12.973641914999998, 79.158592345],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_a5b9948b33f3b230081d80d2262f347a = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_65058d135f9f599d44e324aa1c772def = $(`<div id="html_65058d135f9f599d44e324aa1c772def" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>30 ppm</b><br>             Temperature : <b>30.0 °C</b><br>             Humidity    : <b>63.8 %</b><br>             <small style="color:#888">                 (12.97364, 79.15859)<br>                 2026-03-10T11:37:30.948719+00:00             </small>         </div>         </div>`)[0];
+                popup_a5b9948b33f3b230081d80d2262f347a.setContent(html_65058d135f9f599d44e324aa1c772def);
+            
+        
+
+        circle_marker_50c7fffffd27376941c62f3d0e5bbc27.bindPopup(popup_a5b9948b33f3b230081d80d2262f347a)
+        ;
+
+        
+    
+    
+            var circle_marker_59ca7dd6badd8a4c4ff826c37ff10a8f = L.circleMarker(
+                [12.973622627999998, 79.158415322],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_751679d24e8b164a2244ed400492d703 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_82f559ff4714b82279fa32632467bf91 = $(`<div id="html_82f559ff4714b82279fa32632467bf91" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>20 ppm</b><br>             Temperature : <b>29.7 °C</b><br>             Humidity    : <b>51.6 %</b><br>             <small style="color:#888">                 (12.97362, 79.15842)<br>                 2026-03-10T11:36:40.983661+00:00             </small>         </div>         </div>`)[0];
+                popup_751679d24e8b164a2244ed400492d703.setContent(html_82f559ff4714b82279fa32632467bf91);
+            
+        
+
+        circle_marker_59ca7dd6badd8a4c4ff826c37ff10a8f.bindPopup(popup_751679d24e8b164a2244ed400492d703)
+        ;
+
+        
+    
+    
+            var circle_marker_ab3082c62c80982a9dc8ec8172a0a729 = L.circleMarker(
+                [12.9736173, 79.15791993],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_5e4c82b0adcb8047fd7533e418cf174d = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_b503a104c77616bccf86b06cd9b0c860 = $(`<div id="html_b503a104c77616bccf86b06cd9b0c860" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>13 ppm</b><br>             Temperature : <b>29.5 °C</b><br>             Humidity    : <b>51.3 %</b><br>             <small style="color:#888">                 (12.97362, 79.15792)<br>                 2026-03-10T11:35:50.940339+00:00             </small>         </div>         </div>`)[0];
+                popup_5e4c82b0adcb8047fd7533e418cf174d.setContent(html_b503a104c77616bccf86b06cd9b0c860);
+            
+        
+
+        circle_marker_ab3082c62c80982a9dc8ec8172a0a729.bindPopup(popup_5e4c82b0adcb8047fd7533e418cf174d)
+        ;
+
+        
+    
+    
+            var circle_marker_89c310cf2e2967d6ddfc9a18235cf077 = L.circleMarker(
+                [12.973665180000001, 79.157308659],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_13274981855287ec441b5ef25e6eab5b = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_955dd122d949410c3bd379751df56661 = $(`<div id="html_955dd122d949410c3bd379751df56661" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>12 ppm</b><br>             Temperature : <b>29.9 °C</b><br>             Humidity    : <b>50.6 %</b><br>             <small style="color:#888">                 (12.97367, 79.15731)<br>                 2026-03-10T11:35:03.412699+00:00             </small>         </div>         </div>`)[0];
+                popup_13274981855287ec441b5ef25e6eab5b.setContent(html_955dd122d949410c3bd379751df56661);
+            
+        
+
+        circle_marker_89c310cf2e2967d6ddfc9a18235cf077.bindPopup(popup_13274981855287ec441b5ef25e6eab5b)
+        ;
+
+        
+    
+    
+            var circle_marker_4fdd6368c1f0a5ba7ccdf8d825727a9e = L.circleMarker(
+                [12.973332172, 79.156924954],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_4cdb3ef79096af91a44511cc9bfa7ccd = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_bc7bd552549be5d02e3189d992fe4292 = $(`<div id="html_bc7bd552549be5d02e3189d992fe4292" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>16 ppm</b><br>             Temperature : <b>30.1 °C</b><br>             Humidity    : <b>50.5 %</b><br>             <small style="color:#888">                 (12.97333, 79.15692)<br>                 2026-03-10T11:34:10.937493+00:00             </small>         </div>         </div>`)[0];
+                popup_4cdb3ef79096af91a44511cc9bfa7ccd.setContent(html_bc7bd552549be5d02e3189d992fe4292);
+            
+        
+
+        circle_marker_4fdd6368c1f0a5ba7ccdf8d825727a9e.bindPopup(popup_4cdb3ef79096af91a44511cc9bfa7ccd)
+        ;
+
+        
+    
+    
+            var circle_marker_e618e56e5705b04f59063b20e316f262 = L.circleMarker(
+                [12.973077121, 79.156712897],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_3ef52ccdb0ff5c05124c520b486d7c27 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_fc8c9a8908dd9477b059050ee1ad2501 = $(`<div id="html_fc8c9a8908dd9477b059050ee1ad2501" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>27 ppm</b><br>             Temperature : <b>30.4 °C</b><br>             Humidity    : <b>50.4 %</b><br>             <small style="color:#888">                 (12.97308, 79.15671)<br>                 2026-03-10T11:33:20.665866+00:00             </small>         </div>         </div>`)[0];
+                popup_3ef52ccdb0ff5c05124c520b486d7c27.setContent(html_fc8c9a8908dd9477b059050ee1ad2501);
+            
+        
+
+        circle_marker_e618e56e5705b04f59063b20e316f262.bindPopup(popup_3ef52ccdb0ff5c05124c520b486d7c27)
+        ;
+
+        
+    
+    
+            var circle_marker_74e5cbc322b68a469f2448abc0833db3 = L.circleMarker(
+                [12.97300829, 79.15670932],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_cb9a17d71edca46d323e58383eedfb88 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_f80fb535901792729fea8b01d9116862 = $(`<div id="html_f80fb535901792729fea8b01d9116862" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>25 ppm</b><br>             Temperature : <b>30.5 °C</b><br>             Humidity    : <b>51.0 %</b><br>             <small style="color:#888">                 (12.97301, 79.15671)<br>                 2026-03-10T11:32:30.549335+00:00             </small>         </div>         </div>`)[0];
+                popup_cb9a17d71edca46d323e58383eedfb88.setContent(html_f80fb535901792729fea8b01d9116862);
+            
+        
+
+        circle_marker_74e5cbc322b68a469f2448abc0833db3.bindPopup(popup_cb9a17d71edca46d323e58383eedfb88)
+        ;
+
+        
+    
+    
+            var circle_marker_e5d90a68ec645467be5566ee027600b8 = L.circleMarker(
+                [12.972691029999998, 79.1571251],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_61536b6214dfea85649ba6f58387b07d = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_c92d156d34376e751e83117ea213e7c1 = $(`<div id="html_c92d156d34376e751e83117ea213e7c1" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>14 ppm</b><br>             Temperature : <b>30.3 °C</b><br>             Humidity    : <b>50.2 %</b><br>             <small style="color:#888">                 (12.97269, 79.15713)<br>                 2026-03-10T11:31:40.533450+00:00             </small>         </div>         </div>`)[0];
+                popup_61536b6214dfea85649ba6f58387b07d.setContent(html_c92d156d34376e751e83117ea213e7c1);
+            
+        
+
+        circle_marker_e5d90a68ec645467be5566ee027600b8.bindPopup(popup_61536b6214dfea85649ba6f58387b07d)
+        ;
+
+        
+    
+    
+            var circle_marker_66b5d6cfc8db29183f2b8c8a80adedc3 = L.circleMarker(
+                [12.972732021999999, 79.157644892],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_dda828b5e10a9e91fde2d29df0457459 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_73d75b174b4a45ecb2b33259d00b2410 = $(`<div id="html_73d75b174b4a45ecb2b33259d00b2410" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>27 ppm</b><br>             Temperature : <b>29.8 °C</b><br>             Humidity    : <b>51.4 %</b><br>             <small style="color:#888">                 (12.97273, 79.15764)<br>                 2026-03-10T11:30:50.331595+00:00             </small>         </div>         </div>`)[0];
+                popup_dda828b5e10a9e91fde2d29df0457459.setContent(html_73d75b174b4a45ecb2b33259d00b2410);
+            
+        
+
+        circle_marker_66b5d6cfc8db29183f2b8c8a80adedc3.bindPopup(popup_dda828b5e10a9e91fde2d29df0457459)
+        ;
+
+        
+    
+    
+            var circle_marker_75f8b5ca555144e9470d82f4289586eb = L.circleMarker(
+                [12.972736205999999, 79.15809948799999],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_5c4398adee09c3878e3545819e7b440a = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_194757bf3b33cd09c3ff232d807f11c9 = $(`<div id="html_194757bf3b33cd09c3ff232d807f11c9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>25 ppm</b><br>             Temperature : <b>29.6 °C</b><br>             Humidity    : <b>51.6 %</b><br>             <small style="color:#888">                 (12.97274, 79.15810)<br>                 2026-03-10T11:30:00.336321+00:00             </small>         </div>         </div>`)[0];
+                popup_5c4398adee09c3878e3545819e7b440a.setContent(html_194757bf3b33cd09c3ff232d807f11c9);
+            
+        
+
+        circle_marker_75f8b5ca555144e9470d82f4289586eb.bindPopup(popup_5c4398adee09c3878e3545819e7b440a)
+        ;
+
+        
+    
+    
+            var circle_marker_922bff4b870f1a81a69b7a5f9bff0d70 = L.circleMarker(
+                [12.972704841, 79.158479175],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_09c0bff5140e7c3c1d9329ba0757ac00 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_d85b07124e981f15343455e4b3d25b54 = $(`<div id="html_d85b07124e981f15343455e4b3d25b54" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>18 ppm</b><br>             Temperature : <b>29.6 °C</b><br>             Humidity    : <b>52.3 %</b><br>             <small style="color:#888">                 (12.97270, 79.15848)<br>                 2026-03-10T11:29:10.334738+00:00             </small>         </div>         </div>`)[0];
+                popup_09c0bff5140e7c3c1d9329ba0757ac00.setContent(html_d85b07124e981f15343455e4b3d25b54);
+            
+        
+
+        circle_marker_922bff4b870f1a81a69b7a5f9bff0d70.bindPopup(popup_09c0bff5140e7c3c1d9329ba0757ac00)
+        ;
+
+        
+    
+    
+            var circle_marker_0e23ef285c5e04b2c47b1ec97463682f = L.circleMarker(
+                [12.972603240000002, 79.15876668],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_ff608dbb549ac4c0019b930c9152bd33 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_5a269021e43c7b89eb05a8aa751686d8 = $(`<div id="html_5a269021e43c7b89eb05a8aa751686d8" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>9 ppm</b><br>             Temperature : <b>29.3 °C</b><br>             Humidity    : <b>52.7 %</b><br>             <small style="color:#888">                 (12.97260, 79.15877)<br>                 2026-03-10T11:28:20.375091+00:00             </small>         </div>         </div>`)[0];
+                popup_ff608dbb549ac4c0019b930c9152bd33.setContent(html_5a269021e43c7b89eb05a8aa751686d8);
+            
+        
+
+        circle_marker_0e23ef285c5e04b2c47b1ec97463682f.bindPopup(popup_ff608dbb549ac4c0019b930c9152bd33)
+        ;
+
+        
+    
+    
+            var circle_marker_41e3c482c573dca41aa9ed1bfbc8a8eb = L.circleMarker(
+                [12.97277076, 79.15899969899999],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_f28dd57b29f719309a8e0f4b434d0481 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_0b459975f5609ed1e3bad8517fadcbdc = $(`<div id="html_0b459975f5609ed1e3bad8517fadcbdc" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>9 ppm</b><br>             Temperature : <b>29.3 °C</b><br>             Humidity    : <b>53.1 %</b><br>             <small style="color:#888">                 (12.97277, 79.15900)<br>                 2026-03-10T11:27:30.361582+00:00             </small>         </div>         </div>`)[0];
+                popup_f28dd57b29f719309a8e0f4b434d0481.setContent(html_0b459975f5609ed1e3bad8517fadcbdc);
+            
+        
+
+        circle_marker_41e3c482c573dca41aa9ed1bfbc8a8eb.bindPopup(popup_f28dd57b29f719309a8e0f4b434d0481)
+        ;
+
+        
+    
+    
+            var circle_marker_c9a35528a5d4e277ed7678663eafde7b = L.circleMarker(
+                [12.9728416, 79.15909751],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_37791979d7c9e44c4e52bda0bbc0fd0d = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_dd1cadbb6d5f7ff27bcd75958dd9e512 = $(`<div id="html_dd1cadbb6d5f7ff27bcd75958dd9e512" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>10 ppm</b><br>             Temperature : <b>29.4 °C</b><br>             Humidity    : <b>53.7 %</b><br>             <small style="color:#888">                 (12.97284, 79.15910)<br>                 2026-03-10T11:26:36.514069+00:00             </small>         </div>         </div>`)[0];
+                popup_37791979d7c9e44c4e52bda0bbc0fd0d.setContent(html_dd1cadbb6d5f7ff27bcd75958dd9e512);
+            
+        
+
+        circle_marker_c9a35528a5d4e277ed7678663eafde7b.bindPopup(popup_37791979d7c9e44c4e52bda0bbc0fd0d)
+        ;
+
+        
+    
+    
+            var circle_marker_290653e8faf0e53b2e664317ff3293b8 = L.circleMarker(
+                [12.972840264000002, 79.159088754],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_240364480dea459bd4f7bf9126a34af1 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_c894d6d630b4b280da5401ff43327f8c = $(`<div id="html_c894d6d630b4b280da5401ff43327f8c" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>10 ppm</b><br>             Temperature : <b>29.3 °C</b><br>             Humidity    : <b>53.8 %</b><br>             <small style="color:#888">                 (12.97284, 79.15909)<br>                 2026-03-10T11:25:05.848501+00:00             </small>         </div>         </div>`)[0];
+                popup_240364480dea459bd4f7bf9126a34af1.setContent(html_c894d6d630b4b280da5401ff43327f8c);
+            
+        
+
+        circle_marker_290653e8faf0e53b2e664317ff3293b8.bindPopup(popup_240364480dea459bd4f7bf9126a34af1)
+        ;
+
+        
+    
+    
+            var circle_marker_208e587c2651530343955ad1f81f2f63 = L.circleMarker(
+                [12.972835667999998, 79.15906941099999],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_b698a6659db42cc7d16b1403f6a7b8c1 = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_15ede187cb5e1c198a30144f071410ae = $(`<div id="html_15ede187cb5e1c198a30144f071410ae" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>10 ppm</b><br>             Temperature : <b>29.3 °C</b><br>             Humidity    : <b>53.7 %</b><br>             <small style="color:#888">                 (12.97284, 79.15907)<br>                 2026-03-10T11:24:14.703539+00:00             </small>         </div>         </div>`)[0];
+                popup_b698a6659db42cc7d16b1403f6a7b8c1.setContent(html_15ede187cb5e1c198a30144f071410ae);
+            
+        
+
+        circle_marker_208e587c2651530343955ad1f81f2f63.bindPopup(popup_b698a6659db42cc7d16b1403f6a7b8c1)
+        ;
+
+        
+    
+    
+            var circle_marker_71f20065f543d54703f262fa9789dcb4 = L.circleMarker(
+                [12.972812007000002, 79.159013538],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.75, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(feature_group_80713be6de0c122f90afb46faf23cd95);
+        
+    
+        var popup_3bb58a8da64d09725ff46581642cc95d = L.popup({
+  "maxWidth": 240,
+});
+
+        
+            
+                var html_17fb767f35a2e32dccea13200c3c55d3 = $(`<div id="html_17fb767f35a2e32dccea13200c3c55d3" style="width: 100.0%; height: 100.0%;">         <div style="font-family: monospace; font-size: 13px; padding: 4px;">             <b>Sensor Reading</b><br>             <hr style="margin:4px 0">             CO₂         : <b>10 ppm</b><br>             Temperature : <b>29.3 °C</b><br>             Humidity    : <b>53.4 %</b><br>             <small style="color:#888">                 (12.97281, 79.15901)<br>                 2026-03-10T11:23:21.253116+00:00             </small>         </div>         </div>`)[0];
+                popup_3bb58a8da64d09725ff46581642cc95d.setContent(html_17fb767f35a2e32dccea13200c3c55d3);
+            
+        
+
+        circle_marker_71f20065f543d54703f262fa9789dcb4.bindPopup(popup_3bb58a8da64d09725ff46581642cc95d)
+        ;
+
+        
+    
+    
+            var layer_control_9a984b498c170b363b19bda2bf3da2ea_layers = {
+                base_layers : {
+                    "cartodbdarkmatter" : tile_layer_e76c72584dbf2c112ee95ace9c5fe887,
+                },
+                overlays :  {
+                    "CO\u2082 (ppm)" : heat_map_9c7120389dcb4d844825fc830e1c49ff,
+                    "Temperature (\u00b0C)" : heat_map_50bceb075bd3c31eb819a4d6302710d1,
+                    "Sensor Readings" : feature_group_80713be6de0c122f90afb46faf23cd95,
+                },
+            };
+            let layer_control_9a984b498c170b363b19bda2bf3da2ea = L.control.layers(
+                layer_control_9a984b498c170b363b19bda2bf3da2ea_layers.base_layers,
+                layer_control_9a984b498c170b363b19bda2bf3da2ea_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_37ec4bce7c82b2ff5fc9d8d83e825b22);
+
+        
+</script>
+</html>
