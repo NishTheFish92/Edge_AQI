@@ -2,11 +2,15 @@
 #include <HTTPClient.h>
 #include <EEPROM.h>
 #include <DHT.h>
+#include <Adafruit_NeoPixel.h>
+#include <Wire.h>
+#include <U8g2lib.h>
 
 // ── WiFi credentials (see secrets.h — do not commit) ────────────────────────
 #include "secrets.h"
 
-// ── Sensor pins ─────────────────────────────────────────────────────────────
+// ── Sensor and led pins ─────────────────────────────────────────────────────────────
+#define LED_PIN 48
 #define DHT_PIN  4    // GPIO4
 #define MQ135_PIN 7   // ADC pin
 
@@ -20,6 +24,13 @@
 #define SEND_INTERVAL_MS   5000
 
 DHT dht(DHT_PIN, DHT11);
+Adafruit_NeoPixel led(1, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+// 1.3" OLED — SH1106 128×64 over hardware I2C
+// If your display uses SSD1306 instead, swap this line with:
+//   U8G2_SSD1306_128X64_NONAME_F_HW_I2C display(U8G2_R0, U8X8_PIN_NONE);
+U8G2_SH1106_128X64_NONAME_F_HW_I2C display(U8G2_R0, U8X8_PIN_NONE);
+
 float R0 = 0;
 
 float tempSum = 0, humSum = 0, co2Sum = 0;
@@ -29,6 +40,32 @@ unsigned long lastSampleTime = 0;
 unsigned long lastSendTime   = 0;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
+void setLED(bool wifiOk) {
+  led.setPixelColor(0, wifiOk ? led.Color(0, 255, 0)   // green = connected
+                               : led.Color(255, 0, 0)); // red   = disconnected
+  led.show();
+}
+
+void updateDisplay(float temp, float hum, float co2) {
+  char buf[32];
+  display.clearBuffer();
+  display.setFont(u8g2_font_ncenB08_tr);
+
+  display.drawStr(0, 12, "Air Quality Monitor");
+  display.drawHLine(0, 14, 128);
+
+  snprintf(buf, sizeof(buf), "Temp: %.1f C", temp);
+  display.drawStr(0, 30, buf);
+
+  snprintf(buf, sizeof(buf), "Hum:  %.1f %%", hum);
+  display.drawStr(0, 44, buf);
+
+  snprintf(buf, sizeof(buf), "CO2:  %.0f ppm", co2);
+  display.drawStr(0, 58, buf);
+
+  display.sendBuffer();
+}
+
 void connectWiFi() {
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to WiFi");
@@ -79,6 +116,18 @@ void setup() {
   EEPROM.begin(512);
   dht.begin();
 
+  // LED — red until WiFi connects
+  led.begin();
+  led.setBrightness(50);
+  setLED(false);
+
+  // OLED
+  display.begin();
+  display.clearBuffer();
+  display.setFont(u8g2_font_ncenB08_tr);
+  display.drawStr(0, 30, "Connecting WiFi...");
+  display.sendBuffer();
+
   EEPROM.get(0, R0);
   if (isnan(R0) || R0 <= 0) {
     Serial.println("WARNING: No valid R0 in EEPROM. Using R0_DEFAULT — run calibration and re-flash for accurate CO2 readings.");
@@ -87,6 +136,13 @@ void setup() {
   Serial.printf("Using R0: %.4f\n", R0);
 
   connectWiFi();
+  setLED(true);  // green — connected
+
+  display.clearBuffer();
+  display.setFont(u8g2_font_ncenB08_tr);
+  display.drawStr(0, 30, "WiFi Connected!");
+  display.sendBuffer();
+  delay(1000);
 
   lastSampleTime = millis();
   lastSendTime   = millis();
@@ -96,8 +152,10 @@ void setup() {
 void loop() {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WiFi lost. Reconnecting...");
+    setLED(false);
     WiFi.disconnect();
     connectWiFi();
+    setLED(true);
   }
 
   unsigned long now = millis();
@@ -135,6 +193,7 @@ void loop() {
     Serial.printf("Avg (%d samples) — Temp: %.2f°C | Hum: %.2f%% | CO2: %.2f ppm\n",
                   sampleCount, avgTemp, avgHum, avgCO2);
 
+    updateDisplay(avgTemp, avgHum, avgCO2);
     sendData(avgTemp, avgHum, avgCO2);
 
     tempSum = humSum = co2Sum = 0;
