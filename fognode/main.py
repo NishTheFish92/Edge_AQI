@@ -1,8 +1,10 @@
 import json
 import logging
 import os
+import statistics
 import subprocess
 import time
+from collections import deque
 from datetime import datetime, timezone
 
 import requests
@@ -25,6 +27,20 @@ GPS_REFRESH_INTERVAL = int(os.getenv("GPS_REFRESH_INTERVAL", "60"))
 _lat = FALLBACK_LAT
 _lon = FALLBACK_LON
 _last_gps_update = 0.0
+
+# Outlier rejection: drop a reading more than 4 std devs from the last 20 readings
+_window = deque(maxlen=20)
+
+
+def is_outlier(reading):
+    # Every reading enters the window, so a genuine level shift is absorbed after a few readings
+    outlier = len(_window) >= 10 and any(
+        abs(reading[f] - statistics.fmean(r[f] for r in _window))
+        > 4 * max(statistics.pstdev([r[f] for r in _window]), 1.0)
+        for f in REQUIRED_FIELDS
+    )
+    _window.append(reading)
+    return outlier
 
 
 def get_location():
@@ -56,11 +72,14 @@ def receive_sensor():
     if missing:
         return jsonify({"error": f"Missing fields: {', '.join(sorted(missing))}"}), 400
 
+    reading = {f: float(data[f]) for f in REQUIRED_FIELDS}
+    if is_outlier(reading):
+        logger.info("Outlier rejected: %s", reading)
+        return jsonify({"status": "rejected", "reason": "outlier"}), 200
+
     lat, lon = get_location()
     payload = {
-        "temperature": float(data["temperature"]),
-        "humidity": float(data["humidity"]),
-        "co2_ppm": float(data["co2_ppm"]),
+        **reading,
         "latitude": lat,
         "longitude": lon,
         "timestamp": datetime.now(timezone.utc).isoformat(),

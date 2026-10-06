@@ -20,8 +20,10 @@
 #define R0_DEFAULT 10.0f  // Fallback R0 if EEPROM is blank — replace with your calibrated value
 
 // ── Timing ───────────────────────────────────────────────────────────────────
-#define SAMPLE_INTERVAL_MS 250
-#define SEND_INTERVAL_MS   5000
+// Adaptive sampling: cleaner air -> longer sample interval (fewer samples and sends).
+// Node sends one averaged reading every SAMPLES_PER_SEND samples.
+#define SAMPLES_PER_SEND   5
+#define RISE_THRESHOLD_PPM 100   // sample-to-sample rise that forces fast sampling
 
 DHT dht(DHT_PIN, DHT11);
 Adafruit_NeoPixel led(1, LED_PIN, NEO_GRB + NEO_KHZ800);
@@ -37,13 +39,21 @@ float tempSum = 0, humSum = 0, co2Sum = 0;
 int   sampleCount = 0;
 
 unsigned long lastSampleTime = 0;
-unsigned long lastSendTime   = 0;
+unsigned long sampleInterval = 4000;
+float lastCO2 = 0;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 void setLED(bool wifiOk) {
   led.setPixelColor(0, wifiOk ? led.Color(0, 255, 0)   // green = connected
                                : led.Color(255, 0, 0)); // red   = disconnected
   led.show();
+}
+
+// CO2 level -> time until next sample (ms)
+unsigned long intervalFor(float co2) {
+  if (co2 < 800)  return 4000;  // clean
+  if (co2 < 1500) return 2000;  // moderate
+  return 1000;                  // high
 }
 
 void updateDisplay(float temp, float hum, float co2) {
@@ -145,7 +155,6 @@ void setup() {
   delay(1000);
 
   lastSampleTime = millis();
-  lastSendTime   = millis();
 }
 
 // ── Loop ──────────────────────────────────────────────────────────────────────
@@ -160,8 +169,8 @@ void loop() {
 
   unsigned long now = millis();
 
-  // Sample every 250 ms
-  if (now - lastSampleTime >= SAMPLE_INTERVAL_MS) {
+  // Sample at the adaptive interval
+  if (now - lastSampleTime >= sampleInterval) {
     lastSampleTime = now;
 
     float temp = dht.readTemperature();
@@ -180,13 +189,14 @@ void loop() {
       co2Sum  += co2;
       sampleCount++;
     }
+
+    sampleInterval = intervalFor(co2);
+    if (co2 - lastCO2 > RISE_THRESHOLD_PPM) sampleInterval = 1000;  // rising fast
+    lastCO2 = co2;
   }
 
-  // Send average every 5 s
-  if (now - lastSendTime >= SEND_INTERVAL_MS && sampleCount > 0) {
-    lastSendTime = now;
-
-    float avgTemp = tempSum / sampleCount;
+  // Send average every SAMPLES_PER_SEND samples
+  if (sampleCount >= SAMPLES_PER_SEND) {    float avgTemp = tempSum / sampleCount;
     float avgHum  = humSum  / sampleCount;
     float avgCO2  = co2Sum  / sampleCount;
 
