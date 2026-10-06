@@ -17,13 +17,13 @@
 // ── MQ135 constants ──────────────────────────────────────────────────────────
 #define RL 10.0f        // Load resistance (kΩ)
 #define VC  3.3f        // Supply voltage
-#define R0_DEFAULT 10.0f  // Fallback R0 if EEPROM is blank — replace with your calibrated value
+#define R0_DEFAULT 67.0f  // Fallback R0 if EEPROM is blank. replace with your calibrated value
 
 // ── Timing ───────────────────────────────────────────────────────────────────
 // Adaptive sampling: cleaner air -> longer sample interval (fewer samples and sends).
 // Node sends one averaged reading every SAMPLES_PER_SEND samples.
 #define SAMPLES_PER_SEND   5
-#define RISE_THRESHOLD_PPM 100   // sample-to-sample rise that forces fast sampling
+#define RISE_THRESHOLD_PPM 100   // force fast sampling if rise is fast
 
 DHT dht(DHT_PIN, DHT11);
 Adafruit_NeoPixel led(1, LED_PIN, NEO_GRB + NEO_KHZ800);
@@ -39,7 +39,7 @@ float tempSum = 0, humSum = 0, co2Sum = 0;
 int   sampleCount = 0;
 
 unsigned long lastSampleTime = 0;
-unsigned long sampleInterval = 4000;
+unsigned long sampleInterval = 2000;
 float lastCO2 = 0;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -51,9 +51,9 @@ void setLED(bool wifiOk) {
 
 // CO2 level -> time until next sample (ms)
 unsigned long intervalFor(float co2) {
-  if (co2 < 800)  return 4000;  // clean
-  if (co2 < 1500) return 2000;  // moderate
-  return 1000;                  // high
+  if (co2 < 1000) return 2000;  // clean
+  if (co2 < 1800) return 1000;  // moderate
+  return 500;                   // high
 }
 
 void updateDisplay(float temp, float hum, float co2) {
@@ -191,12 +191,13 @@ void loop() {
     }
 
     sampleInterval = intervalFor(co2);
-    if (co2 - lastCO2 > RISE_THRESHOLD_PPM) sampleInterval = 1000;  // rising fast
+    if (co2 - lastCO2 > RISE_THRESHOLD_PPM) sampleInterval = 500;   // rising fast
     lastCO2 = co2;
   }
 
   // Send average every SAMPLES_PER_SEND samples
-  if (sampleCount >= SAMPLES_PER_SEND) {    float avgTemp = tempSum / sampleCount;
+  if (sampleCount >= SAMPLES_PER_SEND) {
+    float avgTemp = tempSum / sampleCount;
     float avgHum  = humSum  / sampleCount;
     float avgCO2  = co2Sum  / sampleCount;
 
