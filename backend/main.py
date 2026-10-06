@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-DB_PATH = Path(os.getenv("DB_PATH", str(Path(__file__).parent / "air_quality.db")))
+DB_PATH = Path(os.getenv("DB_PATH", str(Path(__file__).parent / "air_quality_2.db")))
 PORT = int(os.getenv("PORT", 5001))
 
 REQUIRED_FIELDS = {"temperature", "humidity", "co2_ppm", "latitude", "longitude"}
