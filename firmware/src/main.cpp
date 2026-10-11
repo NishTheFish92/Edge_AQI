@@ -25,6 +25,9 @@
 #define SAMPLES_PER_SEND   5
 #define RISE_THRESHOLD_PPM 100   // force fast sampling if rise is fast
 
+// ── SPINE node identity (sent with every reading for coordinator discovery) ──
+#define NODE_ID "esp32-aqi-01"
+
 DHT dht(DHT_PIN, DHT11);
 Adafruit_NeoPixel led(1, LED_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -41,6 +44,7 @@ int   sampleCount = 0;
 unsigned long lastSampleTime = 0;
 unsigned long sampleInterval = 2000;
 float lastCO2 = 0;
+unsigned long coordinatorInterval = 0;  // 0 = no coordinator override, use adaptive sampling
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 void setLED(bool wifiOk) {
@@ -88,6 +92,15 @@ void connectWiFi() {
   Serial.println(WiFi.gatewayIP().toString());
 }
 
+// Coordinator config from the response body: positive "interval_ms" -> that value,
+// null / missing / invalid -> 0 (no override)
+unsigned long parseIntervalMs(const String& body) {
+  int i = body.indexOf("\"interval_ms\":");
+  if (i < 0) return 0;
+  long ms = body.substring(i + 14).toInt();  // "null" parses as 0
+  return ms > 0 ? (unsigned long)ms : 0;
+}
+
 void sendData(float avgTemp, float avgHum, float avgCO2) {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WiFi disconnected, skipping send.");
@@ -97,7 +110,10 @@ void sendData(float avgTemp, float avgHum, float avgCO2) {
   String url = "http://" + WiFi.gatewayIP().toString() + ":5000/sensor";
   String payload = "{\"temperature\":" + String(avgTemp, 2)
                  + ",\"humidity\":"    + String(avgHum,  2)
-                 + ",\"co2_ppm\":"     + String(avgCO2,  2) + "}";
+                 + ",\"co2_ppm\":"     + String(avgCO2,  2)
+                 + ",\"node_id\":\"" NODE_ID "\""
+                 + ",\"sensors\":[\"mq135\",\"dht11\"]"
+                 + ",\"functions\":[\"aqi_band\",\"adaptive_sampling\"]}";
 
   const int MAX_ATTEMPTS = 3;
   for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
@@ -109,6 +125,7 @@ void sendData(float avgTemp, float avgHum, float avgCO2) {
     int code = http.POST(payload);
     if (code > 0) {
       Serial.printf("POST -> HTTP %d (attempt %d)\n", code, attempt);
+      coordinatorInterval = parseIntervalMs(http.getString());
       http.end();
       return;
     }
@@ -192,6 +209,7 @@ void loop() {
 
     sampleInterval = intervalFor(co2);
     if (co2 - lastCO2 > RISE_THRESHOLD_PPM) sampleInterval = 500;   // rising fast
+    if (coordinatorInterval > 0) sampleInterval = coordinatorInterval;  // coordinator override
     lastCO2 = co2;
   }
 
