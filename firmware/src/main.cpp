@@ -17,11 +17,16 @@
 // ── MQ135 constants ──────────────────────────────────────────────────────────
 #define RL 10.0f        // Load resistance (kΩ)
 #define VC  3.3f        // Supply voltage
-#define R0_DEFAULT 10.0f  // Fallback R0 if EEPROM is blank — replace with your calibrated value
+#define R0_DEFAULT 67.0f  // Fallback R0 if EEPROM is blank. replace with your calibrated value
 
 // ── Timing ───────────────────────────────────────────────────────────────────
-#define SAMPLE_INTERVAL_MS 250
-#define SEND_INTERVAL_MS   5000
+// Adaptive sampling: cleaner air -> longer sample interval (fewer samples and sends).
+// Node sends one averaged reading every SAMPLES_PER_SEND samples.
+#define SAMPLES_PER_SEND   5
+#define RISE_THRESHOLD_PPM 100   // force fast sampling if rise is fast
+
+// ── SPINE node identity (sent with every reading for coordinator discovery) ──
+#define NODE_ID "esp32-aqi-01"
 
 DHT dht(DHT_PIN, DHT11);
 Adafruit_NeoPixel led(1, LED_PIN, NEO_GRB + NEO_KHZ800);
@@ -37,13 +42,22 @@ float tempSum = 0, humSum = 0, co2Sum = 0;
 int   sampleCount = 0;
 
 unsigned long lastSampleTime = 0;
-unsigned long lastSendTime   = 0;
+unsigned long sampleInterval = 2000;
+float lastCO2 = 0;
+unsigned long coordinatorInterval = 0;  // 0 = no coordinator override, use adaptive sampling
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 void setLED(bool wifiOk) {
   led.setPixelColor(0, wifiOk ? led.Color(0, 255, 0)   // green = connected
                                : led.Color(255, 0, 0)); // red   = disconnected
   led.show();
+}
+
+// CO2 level -> time until next sample (ms)
+unsigned long intervalFor(float co2) {
+  if (co2 < 1000) return 2000;  // clean
+  if (co2 < 1800) return 1000;  // moderate
+  return 500;                   // high
 }
 
 void updateDisplay(float temp, float hum, float co2) {
@@ -78,6 +92,15 @@ void connectWiFi() {
   Serial.println(WiFi.gatewayIP().toString());
 }
 
+// Coordinator config from the response body: positive "interval_ms" -> that value,
+// null / missing / invalid -> 0 (no override)
+unsigned long parseIntervalMs(const String& body) {
+  int i = body.indexOf("\"interval_ms\":");
+  if (i < 0) return 0;
+  long ms = body.substring(i + 14).toInt();  // "null" parses as 0
+  return ms > 0 ? (unsigned long)ms : 0;
+}
+
 void sendData(float avgTemp, float avgHum, float avgCO2) {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WiFi disconnected, skipping send.");
@@ -87,7 +110,10 @@ void sendData(float avgTemp, float avgHum, float avgCO2) {
   String url = "http://" + WiFi.gatewayIP().toString() + ":5000/sensor";
   String payload = "{\"temperature\":" + String(avgTemp, 2)
                  + ",\"humidity\":"    + String(avgHum,  2)
-                 + ",\"co2_ppm\":"     + String(avgCO2,  2) + "}";
+                 + ",\"co2_ppm\":"     + String(avgCO2,  2)
+                 + ",\"node_id\":\"" NODE_ID "\""
+                 + ",\"sensors\":[\"mq135\",\"dht11\"]"
+                 + ",\"functions\":[\"aqi_band\",\"adaptive_sampling\"]}";
 
   const int MAX_ATTEMPTS = 3;
   for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
@@ -99,6 +125,7 @@ void sendData(float avgTemp, float avgHum, float avgCO2) {
     int code = http.POST(payload);
     if (code > 0) {
       Serial.printf("POST -> HTTP %d (attempt %d)\n", code, attempt);
+      coordinatorInterval = parseIntervalMs(http.getString());
       http.end();
       return;
     }
@@ -145,7 +172,6 @@ void setup() {
   delay(1000);
 
   lastSampleTime = millis();
-  lastSendTime   = millis();
 }
 
 // ── Loop ──────────────────────────────────────────────────────────────────────
@@ -160,8 +186,8 @@ void loop() {
 
   unsigned long now = millis();
 
-  // Sample every 250 ms
-  if (now - lastSampleTime >= SAMPLE_INTERVAL_MS) {
+  // Sample at the adaptive interval
+  if (now - lastSampleTime >= sampleInterval) {
     lastSampleTime = now;
 
     float temp = dht.readTemperature();
@@ -180,12 +206,15 @@ void loop() {
       co2Sum  += co2;
       sampleCount++;
     }
+
+    sampleInterval = intervalFor(co2);
+    if (co2 - lastCO2 > RISE_THRESHOLD_PPM) sampleInterval = 500;   // rising fast
+    if (coordinatorInterval > 0) sampleInterval = coordinatorInterval;  // coordinator override
+    lastCO2 = co2;
   }
 
-  // Send average every 5 s
-  if (now - lastSendTime >= SEND_INTERVAL_MS && sampleCount > 0) {
-    lastSendTime = now;
-
+  // Send average every SAMPLES_PER_SEND samples
+  if (sampleCount >= SAMPLES_PER_SEND) {
     float avgTemp = tempSum / sampleCount;
     float avgHum  = humSum  / sampleCount;
     float avgCO2  = co2Sum  / sampleCount;

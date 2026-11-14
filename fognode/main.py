@@ -1,8 +1,10 @@
 import json
 import logging
 import os
+import statistics
 import subprocess
 import time
+from collections import deque
 from datetime import datetime, timezone
 
 import requests
@@ -22,9 +24,38 @@ FALLBACK_LAT = float(os.getenv("FALLBACK_LAT", "11.3410"))
 FALLBACK_LON = float(os.getenv("FALLBACK_LON", "77.7172"))
 GPS_REFRESH_INTERVAL = int(os.getenv("GPS_REFRESH_INTERVAL", "60"))
 
+
+def _coordinator_interval():
+    # SPINE coordinator config: sampling interval pushed to nodes; None lets nodes self-adapt
+    try:
+        ms = int(os.getenv("COORDINATOR_INTERVAL_MS", ""))
+    except ValueError:
+        return None
+    return ms if ms > 0 else None
+
+
+COORDINATOR_INTERVAL_MS = _coordinator_interval()
+
 _lat = FALLBACK_LAT
 _lon = FALLBACK_LON
 _last_gps_update = 0.0
+
+# Outlier rejection: drop a reading more than 4 std devs from the last 20 readings
+_window = deque(maxlen=20)
+
+# SPINE discovery: node_id -> announced sensors/functions
+_nodes = {}
+
+
+def is_outlier(reading):
+    # Every reading enters the window, so a genuine level shift is absorbed after a few readings
+    outlier = len(_window) >= 10 and any(
+        abs(reading[f] - statistics.fmean(r[f] for r in _window))
+        > 4 * max(statistics.pstdev([r[f] for r in _window]), 1.0)
+        for f in REQUIRED_FIELDS
+    )
+    _window.append(reading)
+    return outlier
 
 
 def get_location():
@@ -46,21 +77,39 @@ def get_location():
     return _lat, _lon
 
 
+def reply(body, status):
+    # Every /sensor reply carries the coordinator config so the node never loses it on an error
+    return jsonify({**body, "interval_ms": COORDINATOR_INTERVAL_MS}), status
+
+
+def register_node(data):
+    node_id = data.get("node_id")
+    if node_id is not None and node_id not in _nodes:
+        _nodes[node_id] = {"sensors": data.get("sensors"), "functions": data.get("functions")}
+        logger.info("Discovered node %s: sensors=%s functions=%s",
+                    node_id, _nodes[node_id]["sensors"], _nodes[node_id]["functions"])
+
+
 @app.route("/sensor", methods=["POST"])
 def receive_sensor():
     data = request.get_json(silent=True)
     if data is None:
-        return jsonify({"error": "Invalid or missing JSON body"}), 400
+        return reply({"error": "Invalid or missing JSON body"}, 400)
 
     missing = REQUIRED_FIELDS - data.keys()
     if missing:
-        return jsonify({"error": f"Missing fields: {', '.join(sorted(missing))}"}), 400
+        return reply({"error": f"Missing fields: {', '.join(sorted(missing))}"}, 400)
+
+    register_node(data)
+
+    reading = {f: float(data[f]) for f in REQUIRED_FIELDS}
+    if is_outlier(reading):
+        logger.info("Outlier rejected: %s", reading)
+        return reply({"status": "rejected", "reason": "outlier"}, 200)
 
     lat, lon = get_location()
     payload = {
-        "temperature": float(data["temperature"]),
-        "humidity": float(data["humidity"]),
-        "co2_ppm": float(data["co2_ppm"]),
+        **reading,
         "latitude": lat,
         "longitude": lon,
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -72,10 +121,10 @@ def receive_sensor():
         resp.raise_for_status()
         logger.info("Forwarded: temp=%.1f hum=%.1f co2=%.1f",
                     payload["temperature"], payload["humidity"], payload["co2_ppm"])
-        return jsonify({"status": "forwarded", "cloud_status": resp.status_code}), 200
+        return reply({"status": "forwarded", "cloud_status": resp.status_code}, 200)
     except Exception as e:
         logger.warning("Forward failed: %s", e)
-        return jsonify({"status": "error", "reason": str(e)}), 503
+        return reply({"status": "error", "reason": str(e)}, 503)
 
 
 if __name__ == "__main__":

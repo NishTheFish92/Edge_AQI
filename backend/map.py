@@ -82,11 +82,16 @@ def build_map(df: pd.DataFrame) -> folium.Map:
     df["temp_norm"] = normalize(df["temperature"])
 
     # ── Base map ──
-    m = folium.Map(
-        location=center,
-        zoom_start=ZOOM_LEVEL,
-        tiles="CartoDB dark_matter",
-    )
+    m = folium.Map(location=center, zoom_start=ZOOM_LEVEL, tiles=None, max_zoom=20)
+    # CARTO tiles need an API key and OSM blocks file:// pages (no Referer); Esri dark gray needs neither.
+    # Esri only has tiles up to z16, so stretch them for z17-20 instead of capping the zoom.
+    folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+        attr="Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ",
+        name="Esri Dark Gray",
+        max_zoom=20,
+        max_native_zoom=16,
+    ).add_to(m)
 
     # ── CO2 Heatmap Layer ──
     co2_data = df[["latitude", "longitude", "co2_norm"]].values.tolist()
